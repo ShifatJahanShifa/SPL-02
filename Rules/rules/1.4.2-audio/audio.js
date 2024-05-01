@@ -23,7 +23,6 @@ async function checkAudioElements(filePath) {
     return problematicLines;
 }
 
-// Example usage: Provide the path to your HTML file
 const filePath = 'C:\\Users\\mdria\\OneDrive\\Desktop\\pakran\\rules\\audio.html';
 
 checkAudioElements(filePath)

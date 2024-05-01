@@ -1,11 +1,25 @@
 const axios = require('axios');
 const fs = require('fs');
 const readline = require('readline');
+const puppeteer=require('puppeteer');
 
 async function checkAccessibilityWithTabindex(url) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    let htmlContent;
     try {
-        const response = await axios.get(url);
-        const htmlContent = response.data;
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        const sourceCode = await page.content();
+        htmlContent=sourceCode;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    } finally {
+        await browser.close();
+    }
+    try {
+        //const response = await axios.get(url);
+        //const htmlContent = response.data;
         const filePath = 'source.html';
         fs.writeFileSync(filePath, htmlContent);
 
@@ -86,5 +100,5 @@ async function checkAccessibilityWithTabindex(url) {
 }
 
 // Usage example:
-const url = 'https://www.amazon.com/'; // Replace with the URL of the webpage you want to check
+const url = 'https://www.amazon.com/'; 
 checkAccessibilityWithTabindex(url);

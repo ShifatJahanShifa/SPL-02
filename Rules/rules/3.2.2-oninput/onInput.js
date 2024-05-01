@@ -56,6 +56,11 @@ async function checkInput(url)
                             check=0;
                             notHidden=0;
                         }
+                        else if(value==='image')
+                        {
+                            check=0;
+                            notHidden=0;
+                        }
                         else if(value!=='hidden') 
                         {
                             //console.log(value, 'uff', i+1);
@@ -97,6 +102,11 @@ async function checkInput(url)
                         let value=typeMatch[1];
                         // console.log(value);
                         if(value==='submit') 
+                        {
+                            check=0;
+                            notHidden=0;
+                        }
+                        else if(value==='image')
                         {
                             check=0;
                             notHidden=0;

@@ -18,6 +18,7 @@ async function checkSkipLink(url)
         let lineNumber = 0;
         let check=0;
         let temp;
+        const lines=[];
         for await(const line of rl) 
         {
             lines.push(line);

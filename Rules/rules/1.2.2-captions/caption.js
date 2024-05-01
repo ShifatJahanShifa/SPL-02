@@ -40,6 +40,7 @@ async function checkInput(url) {
                         {
                             check = 0;
                         }
+                        else noCaption.push(lineNumber);
                     }
                 }  
                 else if (lines[i].includes('</video>')) 
@@ -59,6 +60,7 @@ async function checkInput(url) {
                         if (value === 'captions') {
                             check = 0;
                         }
+                        else noCaption.push(lineNumber);
                     }
                 }
                 lineNumber = i + 1;
@@ -66,7 +68,7 @@ async function checkInput(url) {
         }
 
         console.log('video without caption:');
-        console.log(oninput);
+        console.log(noCaption);
     }
     catch (error) 
     {

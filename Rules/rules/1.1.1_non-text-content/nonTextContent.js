@@ -28,20 +28,20 @@ async function parseHTMLFile(filePath) {
         crlfDelay: Infinity
     });
 
-    let lineNumber = 0; // Initialize line number counter
+    let lineNumber1 = 0; // Initialize line number counter
     let check=0;
     let srcMatch;
     let altMatch;
-    let temp;
+    let lineNumber;
     for await (const line of rl) {
-        lineNumber++; // Increment line number for each line read
+        lineNumber1++; // Increment line number for each line read
         if(check==1) 
         {
             if(line.includes('<img')) 
             {
                 check=0;
                 const src=srcMatch[1];
-                imagesWithoutAlt.push({ src, temp });    
+                imagesWithoutAlt.push({ src, lineNumber });    
             }
             else if(line.includes('alt')) 
             {
@@ -51,7 +51,7 @@ async function parseHTMLFile(filePath) {
                 if (altt==="") 
                 {
                     const src=srcMatch[1];
-                    imagesWithoutAlt.push({ src, temp });  
+                    imagesWithoutAlt.push({ src, lineNumber });  
                 }
             }
 
@@ -63,7 +63,7 @@ async function parseHTMLFile(filePath) {
 
             if (srcMatch) {
                 const src = srcMatch[1];
-                temp=lineNumber;
+                lineNumber=lineNumber1;
                 
                 if (!line.includes('alt')) 
                 {
@@ -75,7 +75,7 @@ async function parseHTMLFile(filePath) {
                     check=0;
                     if (alt==="") 
                     {
-                        imagesWithoutAlt.push({ src, temp });  
+                        imagesWithoutAlt.push({ src, lineNumber });  
                     }
                 }
             }
@@ -87,7 +87,7 @@ async function parseHTMLFile(filePath) {
 
 // Example usage:
 const url = 'http://www.iit.du.ac.bd/';
-const htmlFilePath = 'index.html';
+const htmlFilePath = 'SPL-02/Rules/rules/1.1.1_non-text-content/index.html';
 
 downloadHTML(url, htmlFilePath)
     .then(() => {

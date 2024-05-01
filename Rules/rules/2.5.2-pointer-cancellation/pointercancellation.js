@@ -5,22 +5,19 @@ async function checkDefaultEventOverrides(url) {
     const page = await browser.newPage();
 
     try {
-        console.log(url);
-        await page.goto(url, { waitUntil: 'networkidle2' }); // Use 'networkidle2' instead of 'domcontentloaded'
+        // console.log(url);
+        await page.goto(url, { waitUntil: 'domcontentloaded' }); 
 
-        console.log('hereee');
         const overriddenElements = await page.evaluate(() => {
-            console.log('hereee');
             const overriddenElements = [];
             const allElements = document.querySelectorAll('a, button');
-            console.log('Total elements:', allElements.length); // Check if elements are found
-            console.log('Elements:', allElements); // Log the elements
+            // console.log('Total elements:', allElements.length); // Check if elements are found
+            // console.log('Elements:', allElements); // Log the elements
 
             allElements.forEach(element => {
-                ['mousedown', 'click'].forEach(eventType => {
+                ['mousedown'].forEach(eventType => {
                     const eventListener = element.events && element.events[eventType];
-                    console.log(eventListener);
-                    console.log();
+                    
                     if (eventListener && eventListener.length > 0) {
                         overriddenElements.push({
                             tagName: element.tagName.toLowerCase(),
@@ -55,6 +52,6 @@ async function checkDefaultEventOverrides(url) {
 }
 
 // Usage example:
-const url = 'http://www.iit.du.ac.bd'; // Replace with the URL of the webpage you want to check
+const url = 'http://www.iit.du.ac.bd'; 
 //const url='https://seocrawl.com/en/how-to-find-a-sitemap/';
 checkDefaultEventOverrides(url);

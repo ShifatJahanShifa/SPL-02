@@ -33,7 +33,7 @@ async function extractLinks(url) {
             return linkData;
         });
 
-        // Log the results (you can modify this to store in a map)
+        
         if (links.length > 0) {
             console.log('Links with missing link text and title attribute:');
             links.forEach(link => {
@@ -45,7 +45,8 @@ async function extractLinks(url) {
                 console.log(`Title: ${link.title}`);
                 console.log('---');
             });
-        } else {
+        } 
+        else {
             console.log('No links found with missing link text and title attribute.');
         }
 
