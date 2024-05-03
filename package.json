@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "puppeteer": "^22.7.1"
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "mysql": "^2.18.1",
+    "tar": "^7.0.1"
   }
 }
