@@ -1,0 +1,3 @@
+[submodule "DirectoryStructure/frontend"]
+	path = DirectoryStructure/frontend
+	url = https://help.github.com/articles/ignoring-files/
