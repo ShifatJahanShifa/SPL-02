@@ -64,6 +64,8 @@ async function parseHTMLFile(filePath) {
                     check=0;
                     if (alt==="") 
                     {
+                        let temp;
+                        src=src.concat(lineNumber);
                         imagesWithoutAlt.push({ src, lineNumber });  
                     }
                 }

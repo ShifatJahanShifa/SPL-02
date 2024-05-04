@@ -27,7 +27,7 @@ async function getSourceCode(url)
     {
         const response = await axios.get(url);
         const htmlContent = response.data;
-        const filePath='SPL-02/merge/sourcecode.html';
+        const filePath='sourcecode.html';
         fs.writeFileSync(filePath, htmlContent);
     }
     catch(error)
