@@ -4,7 +4,9 @@ const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs');
 const readline = require('readline');
-const filePath='sourcecode.html';
+const filePath='SPL-02/merge/sourcecode.html';
+let violations=[];
+let details={};
 
 // non-text-content
 async function parseHTMLFile(filePath) {
@@ -15,6 +17,11 @@ async function parseHTMLFile(filePath) {
         input: fileStream,
         crlfDelay: Infinity
     });
+
+    // added
+    let keyy="1.1.1";
+    if(!details[keyy]) 
+        details[keyy]=[];
 
     let lineNumber1 = 0; // Initialize line number counter
     let check=0;
@@ -30,7 +37,17 @@ async function parseHTMLFile(filePath) {
             {
                 check=0;
                 const src=srcMatch[1];
-                imagesWithoutAlt.push({ src, lineNumber });    
+                //imagesWithoutAlt.push({ src, lineNumber });  
+
+                // ***** changed ******
+                details[keyy].push(lineNumber, "null", "null");
+                let temp;
+                temp="Image without alt attribute or alt with null value:  ";
+                temp=temp.concat("src: ",src);
+                temp=temp.concat(" , line number: ",lineNumber);
+                imagesWithoutAlt.push(temp);   
+
+                // ***** changed *******
             }
             else if(line.includes('alt')) 
             {
@@ -40,7 +57,16 @@ async function parseHTMLFile(filePath) {
                 if (altt==="") 
                 {
                     const src=srcMatch[1];
-                    imagesWithoutAlt.push({ src, lineNumber });  
+
+                    // ***** changed ******
+                    details[keyy].push(lineNumber, "null", "null");
+                    let temp;
+                    temp="Image without alt attribute or alt with null value:  ";
+                    temp=temp.concat("src: ",src);
+                    temp=temp.concat(" , line number: ",lineNumber);
+                    imagesWithoutAlt.push(temp);  
+
+                    // ***** changed ******
                 }
             }
 
@@ -64,9 +90,15 @@ async function parseHTMLFile(filePath) {
                     check=0;
                     if (alt==="") 
                     {
+                        // ***** changed ******
+                        details[keyy].push(lineNumber, "null", "null");
                         let temp;
-                        src=src.concat(lineNumber);
-                        imagesWithoutAlt.push({ src, lineNumber });  
+                        temp="Image without alt attribute or alt with null value:  ";
+                        temp=temp.concat("src: ",src);
+                        temp=temp.concat(" , line number: ",lineNumber);
+                        imagesWithoutAlt.push(temp);  
+
+                        // ***** changed ******
                     }
                 }
             }
@@ -75,10 +107,13 @@ async function parseHTMLFile(filePath) {
 
     if(imagesWithoutAlt.length)
     {
-        console.log('Images without alt attribute:');
+        //console.log('Images without alt attribute:');
         console.log(imagesWithoutAlt);
+        if(imagesWithoutAlt.length>0)
+        violations.push(imagesWithoutAlt);
     }
 }
+
 
 // caption
 async function checkCaption(filePath)
@@ -95,6 +130,11 @@ async function checkCaption(filePath)
         input: fileStream,
         crlfDelay: Infinity
     });
+
+    // changed 
+    let keyy="1.2.2";
+    if(!details[keyy])
+        details[keyy]=[];
 
     const lines = [];
     let lineNumber = 0;
@@ -122,13 +162,30 @@ async function checkCaption(filePath)
                     {
                         check = 0;
                     }
-                    else noCaption.push(lineNumber);
+                    else 
+                    {
+                        // ****** changed *****
+                        details[keyy].push(lineNumber,"null","null");
+                        let temp="Video without caption: line number - ";
+                        temp=temp.concat(lineNumber);
+                        noCaption.push(temp);
+
+                        // ****** changed *****
+                    }
                 }
             }  
             else if (lines[i].includes('</video>')) 
             {
                 check = 0;
-                noCaption.push(lineNumber);
+                //noCaption.push(lineNumber);
+
+                // ****** changed *****
+                details[keyy].push(lineNumber,"null","null");
+                let temp="Video without caption: line number - ";
+                temp=temp.concat(lineNumber);
+                noCaption.push(temp);
+
+                // ****** changed *****
             }
         }
         if (lines[i].includes('<video')) 
@@ -142,15 +199,29 @@ async function checkCaption(filePath)
                     if (value === 'captions') {
                         check = 0;
                     }
-                    else noCaption.push(lineNumber);
+                    else 
+                    {
+                        //noCaption.push(lineNumber);
+                        // ****** changed *****
+                        details[keyy].push(lineNumber,"null","null");
+                        let temp="Video without caption: line number - ";
+                        temp=temp.concat(lineNumber);
+                        noCaption.push(temp);
+
+                        // ****** changed *****
+                    }
                 }
             }
             lineNumber = i + 1;
         }
     }
 
+    // changed 
+    if(noCaption.length>0){
     console.log('video without caption:');
     console.log(noCaption);
+     
+    violations.push(noCaption);}
 }
 
 // relationship
@@ -168,6 +239,11 @@ async function checkTableCaption(filePath)
         input: fileStream,
         crlfDelay: Infinity
     });
+
+    // changed 
+    let keyy="1.3.1";
+    if(!details[keyy])
+        details[keyy]=[];
 
     const lines=[];
     let lineNumber = 0;
@@ -189,8 +265,17 @@ async function checkTableCaption(filePath)
             }
             else if(lines[i].includes('<tbody') || lines[i].includes('<thead') || lines[i].includes('<tr')) 
             {
-                noTableCaption.push(lineNumber);
+                
                 check=0;
+                //noTableCaption.push(lineNumber);
+
+                // ***** changed ***********
+                details[keyy].push(lineNumber,"null","null");
+                let temp="Table without caption: line number - ";
+                temp=temp.concat(lineNumber);
+                noTableCaption.push(temp);
+
+                // ***** changed ***********
             } 
         }
         if(lines[i].includes('<table')) 
@@ -205,9 +290,14 @@ async function checkTableCaption(filePath)
 
     }
 
+    // changed
+    if(noTableCaption.length>0) {
     console.log('table without caption:');
     console.log(noTableCaption);
+    
+    violations.push(noTableCaption);}
 }
+
 
 // audio checking
 async function checkAudioElements(filePath) {
@@ -221,15 +311,24 @@ async function checkAudioElements(filePath) {
 
     let lineNumber = 0;
 
+    // changed 
+    let keyy="1.4.2";
+    if(!details[keyy])
+        details[keyy]=[];
+
     for await (const line of rl) {
         lineNumber++;
         //console.log(line);
         if(line.includes('<audio') && line.includes('autoplay') && !line.includes('controls'))
-            problematicLines.push({ line: lineNumber, content: line.trim() });
+        {   
+            let temp="Audio element without controls: line number : "
+            problematicLines.push(lineNumber);
+            details[keyy].push(lineNumber,"null","null");
+        }
     }
 
-    console.log('Problematic Audio Elements:');
-    console.log(problematicLines);
+    if(problematicLines.length>0) 
+        violations.push(problematicLines);
 }
 
 // keyboard
@@ -241,14 +340,20 @@ async function checkAccessibilityWithTabindex(filePath)
         input: fileStream,
         crlfDelay: Infinity
     });
+
     // Define the element types to check for tabindex
     const elementTypesToCheck = [
         '<a', // Links
         '<button', // Buttons
         '<select', // Dropdown/select elements
         '<textarea', // Textareas
-        '<input' // Telephone inputs
+        '<input' // inputs
     ];
+
+    // changed 
+    let keyy="2.1.1";
+    if(!details[keyy]) 
+        details[keyy]=[];
 
     // Process each line of the HTML content
    
@@ -264,12 +369,9 @@ async function checkAccessibilityWithTabindex(filePath)
         
         if (check == 1) 
         {
-            if (line.includes('<a ')) {
+            if (line.includes('<a ')) 
+            {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<a>',
-                    lineNumber: temp    
-                });
             }
             else if (line.includes('tabindex')) 
             {
@@ -280,10 +382,13 @@ async function checkAccessibilityWithTabindex(filePath)
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline:  '<a>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check=0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -295,12 +400,16 @@ async function checkAccessibilityWithTabindex(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline:  '<a>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -324,24 +433,25 @@ async function checkAccessibilityWithTabindex(filePath)
         {
             if (line.includes('<button')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<button',
-                    lineNumber: temp    
-                });
+            
             }
             else if (line.includes('tabindex')) 
             {
-                check=0;
                 tabIndexMatch = line.match(/tabindex="(-?\d+)"/);
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<button>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+
+                        // ***** changed *****
+                        check = 0;
                     }
                 }
             }
@@ -352,12 +462,16 @@ async function checkAccessibilityWithTabindex(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<button>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -379,12 +493,9 @@ async function checkAccessibilityWithTabindex(filePath)
         
         if (check == 1) 
         {
-            if (line.includes('<select')) {
+            if (line.includes('<select')) 
+            {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<select>',
-                    lineNumber: temp    
-                });
             }
             else if (line.includes('tabindex')) 
             {
@@ -393,12 +504,16 @@ async function checkAccessibilityWithTabindex(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<select>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -409,12 +524,16 @@ async function checkAccessibilityWithTabindex(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<select>',
-                    lineNumber: lineNumber
-                    });
+                   // **** changed ********
+                   details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -438,10 +557,7 @@ async function checkAccessibilityWithTabindex(filePath)
         {
             if (line.includes('<textaria')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<textaria>',
-                    lineNumber: temp    
-                });
+                
             }
             else if (line.includes('tabindex')) 
             {
@@ -450,12 +566,16 @@ async function checkAccessibilityWithTabindex(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<textaria>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -466,12 +586,16 @@ async function checkAccessibilityWithTabindex(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+               
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<textaria>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -495,10 +619,7 @@ async function checkAccessibilityWithTabindex(filePath)
         {
             if (line.includes('<input')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<input>',
-                    lineNumber: temp    
-                });
+                
             }
             else if (line.includes('tabindex')) 
             {
@@ -507,12 +628,16 @@ async function checkAccessibilityWithTabindex(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<input>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -523,12 +648,16 @@ async function checkAccessibilityWithTabindex(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<input>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -543,15 +672,11 @@ async function checkAccessibilityWithTabindex(filePath)
     if (elementsWithTabIndexLessThanZero.length > 0) 
     {
         console.log('Elements with tabindex < 0:');
-        elementsWithTabIndexLessThanZero.forEach(element => {
-            console.log(`Error: ${element.errorline}, Line Number: ${element.lineNumber}`);
-        });
+        console.log(elementsWithTabIndexLessThanZero);
+        violations.push(elementsWithTabIndexLessThanZero);
     } 
-    else 
-    {
-        console.log('All elements have valid tabindex values!');
-    }
 }
+
 
 //focus order
 async function checkFocusOrder(filePath)
@@ -562,14 +687,20 @@ async function checkFocusOrder(filePath)
         input: fileStream,
         crlfDelay: Infinity
     });
+
     // Define the element types to check for tabindex
     const elementTypesToCheck = [
         '<a', // Links
         '<button', // Buttons
         '<select', // Dropdown/select elements
         '<textarea', // Textareas
-        '<input' // Telephone inputs
+        '<input' // inputs
     ];
+
+    // changed 
+    let keyy="2.4.3";
+    if(!details[keyy]) 
+        details[keyy]=[];
 
     // Process each line of the HTML content
    
@@ -585,12 +716,9 @@ async function checkFocusOrder(filePath)
         
         if (check == 1) 
         {
-            if (line.includes('<a ')) {
+            if (line.includes('<a ')) 
+            {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<a>',
-                    lineNumber: temp    
-                });
             }
             else if (line.includes('tabindex')) 
             {
@@ -601,10 +729,13 @@ async function checkFocusOrder(filePath)
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline:  '<a>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check=0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -616,12 +747,16 @@ async function checkFocusOrder(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline:  '<a>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -645,24 +780,25 @@ async function checkFocusOrder(filePath)
         {
             if (line.includes('<button')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<button',
-                    lineNumber: temp    
-                });
+            
             }
             else if (line.includes('tabindex')) 
             {
-                check=0;
                 tabIndexMatch = line.match(/tabindex="(-?\d+)"/);
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<button>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+
+                        // ***** changed *****
+                        check = 0;
                     }
                 }
             }
@@ -673,12 +809,16 @@ async function checkFocusOrder(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<button>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -700,12 +840,9 @@ async function checkFocusOrder(filePath)
         
         if (check == 1) 
         {
-            if (line.includes('<select')) {
+            if (line.includes('<select')) 
+            {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<select>',
-                    lineNumber: temp    
-                });
             }
             else if (line.includes('tabindex')) 
             {
@@ -714,12 +851,16 @@ async function checkFocusOrder(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<select>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -730,12 +871,16 @@ async function checkFocusOrder(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<select>',
-                    lineNumber: lineNumber
-                    });
+                   // **** changed ********
+                   details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -759,10 +904,7 @@ async function checkFocusOrder(filePath)
         {
             if (line.includes('<textaria')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<textaria>',
-                    lineNumber: temp    
-                });
+                
             }
             else if (line.includes('tabindex')) 
             {
@@ -771,12 +913,16 @@ async function checkFocusOrder(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<textaria>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -787,12 +933,16 @@ async function checkFocusOrder(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+               
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<textaria>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -816,10 +966,7 @@ async function checkFocusOrder(filePath)
         {
             if (line.includes('<input')) {
                 check = 0;
-                elementsWithTabIndexLessThanZero.push({
-                    errorline: '<input>',
-                    lineNumber: temp    
-                });
+                
             }
             else if (line.includes('tabindex')) 
             {
@@ -828,12 +975,16 @@ async function checkFocusOrder(filePath)
                 if (tabIndexMatch) 
                 {
                     const tabIndexValue = parseInt(tabIndexMatch[1]);
+                    
                     if(tabIndexValue < 0)
                     {
-                        elementsWithTabIndexLessThanZero.push({
-                        errorline: '<input>',
-                        lineNumber: temp
-                        });
+                        // **** changed ********
+                        details[keyy].push(temp,"null","null");
+                        let val="Tab index less than zero: line number - ";
+                        val=val.concat(temp);
+                        elementsWithTabIndexLessThanZero.push(val);
+                        check = 0;
+                        // ***** changed *****
                     }
                 }
             }
@@ -844,12 +995,16 @@ async function checkFocusOrder(filePath)
             if (tabIndexMatch) 
             {
                 const tabIndexValue = parseInt(tabIndexMatch[1]);
+                
                 if(tabIndexValue < 0)
                 {
-                    elementsWithTabIndexLessThanZero.push({
-                    errorline: '<input>',
-                    lineNumber: lineNumber
-                    });
+                    // **** changed ********
+                    details[keyy].push(temp,"null","null");
+                    let val="Tab index less than zero: line number - ";
+                    val=val.concat(temp);
+                    elementsWithTabIndexLessThanZero.push(val);
+                    check = 0;
+                    // ***** changed *****
                 }
             }
             else 
@@ -864,14 +1019,9 @@ async function checkFocusOrder(filePath)
     if (elementsWithTabIndexLessThanZero.length > 0) 
     {
         console.log('Elements with tabindex < 0:');
-        elementsWithTabIndexLessThanZero.forEach(element => {
-            console.log(`Error: ${element.errorline}, Line Number: ${element.lineNumber}`);
-        });
+        console.log(elementsWithTabIndexLessThanZero);
+        violations.push(elementsWithTabIndexLessThanZero);
     } 
-    else 
-    {
-        console.log('All elements have valid tabindex values!');
-    }
 }
 
 // one character key
@@ -889,6 +1039,12 @@ async function checkOneCharacterkey(filePath)
     let check = 0;
     let typeMatch;
     let temp; 
+
+    // changed
+    let keyy="2.1.4";
+    if(!details[keyy]) 
+        details[keyy]=[];
+
     for await(const line of rl) 
     {
         lines.push(line);
@@ -902,14 +1058,25 @@ async function checkOneCharacterkey(filePath)
             let keyshortcut=keyMatch[1];
             if(keyshortcut.length==1) 
             {
-                oneCharShortcut.push(i+1);
+                // ***** changed *******
+                details[keyy].push(i+1, "null","null");
+                let temp="One character shortcut key: line number - ";
+                temp=temp.concat(i+1);
+                oneCharShortcut.push(temp);
+
+                // ***** changed *******
             }
         }
     }
 
+    // ********* changed 
+    if(oneCharShortcut.length>0){
     console.log('one character shortcut:');
     console.log(oneCharShortcut);
+    violations.push(oneCharShortcut);
+    }
 }
+
 
 // skip link
 async function checkSkipLink(filePath) 
@@ -928,6 +1095,12 @@ async function checkSkipLink(filePath)
     {
         lines.push(line);
     }
+
+    // changed
+    let keyy="2.4.1";
+    if(!details[keyy]) 
+        details[keyy]=[];
+
     //console.log(lines.length);
     for(let i=0;i<lines.length;i++) 
     {
@@ -961,13 +1134,17 @@ async function checkSkipLink(filePath)
         }
     }
 
-    if(lineNumber==0) console.log("skip link is provided");
-    else 
+    /// changed ****
+    if(lineNumber!=0) 
     {
-        console.log('skip link is not provided');
-        console.log(lineNumber);
+        let temp='skip link is not provided: line number - ';
+        details[keyy].push(lineNumber+1,"null","null");        
+        temp=temp.concat(lineNumber+1);
+        console.log(temp);
+        violations.push(temp);
     }
 }
+
 
 // input
 async function checkOnInput(filePath)
@@ -978,6 +1155,10 @@ async function checkOnInput(filePath)
         input: fileStream,
         crlfDelay: Infinity
     }); 
+
+    // changed
+    let keyy="3.2.2";
+    if(!details[keyy]) details[keyy]=[];
 
     const lines=[];
     let lineNumber = 0;
@@ -1036,7 +1217,12 @@ async function checkOnInput(filePath)
                 check=0;
                 if(notHidden===1)
                 {
-                    oninput.push(lineNumber);
+                    // ******* changed ******
+                    let temp="button without submit type or input without submit or image type: line number - ";
+                    temp=temp.concat(lineNumber);
+                    oninput.push(temp);
+                    details[keyy].push(lineNumber,"null","null");
+                    // ******* changed ******
                 }
                 notHidden=0;
             }
@@ -1084,8 +1270,10 @@ async function checkOnInput(filePath)
         }
     }
 
+    if(oninput.length>0){
     console.log('form without submit option:');
     console.log(oninput);
+    violations.push(oninput);}
 }
 
 // labels
@@ -1097,6 +1285,10 @@ async function checkLabel(url)
         input: fileStream,
         crlfDelay: Infinity
     }); 
+
+    // changed
+    let keyy="3.2.2";
+    if(!details[keyy]) details[keyy]=[];
 
     const lines=[];
     const emit=['button','hidden','image','reset','submit'];
@@ -1129,7 +1321,11 @@ async function checkLabel(url)
                         let forValue=forMatch[1];
                         if(forValue!=id) 
                         {
-                            noLabel.push(i+1);
+                            // **** changed ****
+                            let temp="without label: element in line number - ";
+                            temp=temp.concat(i+1);
+                            noLabel.push(temp);
+                            details[keyy].push(i+1,"null","null");
                         }
                     }
                     else if(lines[i-1].includes('<label')) 
@@ -1138,12 +1334,21 @@ async function checkLabel(url)
                         let forValue=forMatch[1];
                         if(forValue!=id) 
                         {
-                            noLabel.push(i+1);
+                            // ***** changed
+                            let temp="without label: element in line number - ";
+                            temp=temp.concat(i+1);
+                            noLabel.push(temp);
+                            details[keyy].push(i+1,"null","null");
                         }
                     }
                     else 
                     {
-                        noLabel.push(i+1);
+                        //noLabel.push(i+1);
+                        // ***** changed
+                        let temp="without label: element in line number - ";
+                        temp=temp.concat(i+1);
+                        noLabel.push(temp);
+                        details[keyy].push(i+1,"null","null");
                     }
                 }
                 else 
@@ -1156,7 +1361,12 @@ async function checkLabel(url)
                         let forValue=forMatch[1];
                         if(forValue!=id) 
                         {
-                            noLabel.push(i+1);
+                            //noLabel.push(i+1);
+                            // ***** changed
+                            let temp="without label: element in line number - ";
+                            temp=temp.concat(i+1);
+                            noLabel.push(temp);
+                            details[keyy].push(i+1,"null","null");
                         }
                     }
                     else if(lines[i+1].includes('<label'))
@@ -1165,21 +1375,36 @@ async function checkLabel(url)
                         let forValue=forMatch[1];
                         if(forValue!=id) 
                         {
-                            noLabel.push(i+1);
+                            //noLabel.push(i+1);
+                            // ***** changed
+                            let temp="without label: element in line number - ";
+                            temp=temp.concat(i+1);
+                            noLabel.push(temp);
+                            details[keyy].push(i+1,"null","null");
                         }
                     }
                     else 
                     {
-                        noLabel.push(i+1);
+                        //noLabel.push(i+1);
+                        // ***** changed
+                        let temp="without label: element in line number - ";
+                        temp=temp.concat(i+1);
+                        noLabel.push(temp);
+                        details[keyy].push(i+1,"null","null");
                     }
                 }
             }
         }
     }
 
+    // cahnged
+    if(noLabel.length>0){
     console.log('input without label:');
     console.log(noLabel);
+    violations.push(noLabel);
+    }
 }
+
 
 //sensory
 async function checkLabelsHaveText(filePath) {
@@ -1192,6 +1417,10 @@ async function checkLabelsHaveText(filePath) {
         // Evaluate the page to find all label elements
         const labelsWithText = [];
         const labelsWithoutText = {};
+
+        // chnaged
+        let keyy="1.3.3";
+        if(!details[keyy]) details[keyy]=[];
 
         const labelElements = await page.evaluate(() => {
             const labels = Array.from(document.querySelectorAll('label'));
@@ -1218,21 +1447,28 @@ async function checkLabelsHaveText(filePath) {
             }
         });
 
+        //  ****** changed
+        const labelWithoutText=[];
         // Log labels without text
         if (Object.keys(labelsWithoutText).length > 0) {
-            console.log('Labels without text content:');
+            
             Object.entries(labelsWithoutText).forEach(([key, labels]) => {
-                console.log(`- Key: ${key}`);
+                
+                
                 labels.forEach(label => {
-                    console.log(`  - Tag Name: ${label.tagName}`);
-                    console.log(`  - ID: ${label.id || 'N/A'}`);
-                    console.log(`  - Class Name: ${label.className || 'N/A'}`);
+                    let temp='Labels without text content: ';
+
+                    // console.log(`  - Tag Name: ${label.tagName}`);
+                    // console.log(`  - ID: ${label.id || 'N/A'}`);
+                    // console.log(`  - Class Name: ${label.className || 'N/A'}`);
+
+                    temp=temp.concat("tag name: ",label.tagName, " id: ",`${label.id || 'N/A'}`, `class name: ${label.className || 'N/A'}`);
+                    labelWithoutText.push(temp);
+                    details[keyy].push("null",`${label.id || 'null'}`,`${label.className || 'null'}`);
                 });
             });
         } 
-        else {
-            console.log('All label elements contain text content.');
-        }
+        if(labelWithoutText.length>0) violations.push(labelWithoutText);
 
     } catch (error) {
         console.error('Error:', error);
@@ -1240,6 +1476,7 @@ async function checkLabelsHaveText(filePath) {
         await browser.close();
     }
 }
+
 
 // name role value
 async function extractLinks(filePath) {
@@ -1275,22 +1512,30 @@ async function extractLinks(filePath) {
             return linkData;
         });
 
-        
+        // ****** changed 
+        // changed 
+        let keyy="4.1.2";
+        if(!details[keyy]) details[keyy]=[];
+        const faultlink=[];
         if (links.length > 0) {
-            console.log('Links with missing link text and title attribute:');
+            //console.log('Links with missing link text and title attribute:');
             links.forEach(link => {
-                console.log(`Key: ${link.key}`);
-                console.log(`Tag Name: ${link.tagName}`);
-                console.log(`ID: ${link.id}`);
-                console.log(`Class Name: ${link.className}`);
-                console.log(`Href: ${link.href}`);
-                console.log(`Title: ${link.title}`);
-                console.log('---');
+                let temp="Links with missing link text and title attribute: ";
+                temp=temp.concat(`Tag Name: ${link.tagName}`,`ID: ${link.id}`,`Class Name: ${link.className}`,`Href: ${link.href}`)
+                //console.log(`Tag Name: ${link.tagName}`);
+                //console.log(`ID: ${link.id}`);
+                // console.log(`Class Name: ${link.className}`);
+                // console.log(`Href: ${link.href}`);
+                
+                faultlink.push(temp);
+                details[keyy].push("null",`${link.id}`,` ${link.className}`);
             });
+            if(faultlink.length>0) 
+            {
+                violations.push(faultlink);
+            }
         } 
-        else {
-            console.log('No links found with missing link text and title attribute.');
-        }
+        
 
     } catch (error) {
         console.error('Error:', error);
@@ -1298,6 +1543,7 @@ async function extractLinks(filePath) {
         await browser.close();
     }
 }
+
 
 //pointer cancellation
 async function checkDefaultEventOverrides(filePath) {
@@ -1311,8 +1557,8 @@ async function checkDefaultEventOverrides(filePath) {
         const overriddenElements = await page.evaluate(() => {
             const overriddenElements = [];
             const allElements = document.querySelectorAll('a, button');
-            // console.log('Total elements:', allElements.length); // Check if elements are found
-            // console.log('Elements:', allElements); // Log the elements
+            
+        
 
             allElements.forEach(element => {
                 ['mousedown'].forEach(eventType => {
@@ -1332,16 +1578,28 @@ async function checkDefaultEventOverrides(filePath) {
             return overriddenElements;
         });
 
+        // changed
+         // changed
+         let keyy="2.5.2";
+         if(!details[keyy]) details[keyy]=[];
+        const overridden=[];
         if (overriddenElements.length > 0) {
-            console.log('Elements with overridden default events:');
+            
             overriddenElements.forEach(element => {
-                console.log(`- TagName: ${element.tagName}`);
-                console.log(`- ID: ${element.id || 'N/A'}`);
-                console.log(`- Class: ${element.className || 'N/A'}`);
-                console.log(`- Event Type: ${element.eventType}`);
+                let temp='Elements with overridden default click event: ';
+                temp=temp.concat(`- TagName: ${element.tagName}`,`- ID: ${element.id || 'N/A'}`,`- Class: ${element.className || 'N/A'}`)
+                
+                // console.log(`- TagName: ${element.tagName}`);
+                // console.log(`- ID: ${element.id || 'N/A'}`);
+                // console.log(`- Class: ${element.className || 'N/A'}`);
+                
+                overridden.push(temp);
+                details[keyy].push("null",`${element.id || 'null'}`,`${element.className || 'N/A'}`);
             });
-        } else {
-            console.log('No elements with overridden default events found.');
+        }
+        if(overridden.length>0) 
+        {
+            violations.push(overridden);
         }
 
     } catch (error) {
@@ -1357,7 +1615,7 @@ checkCaption(filePath);
 checkTableCaption(filePath);
 checkAudioElements(filePath);
 checkAccessibilityWithTabindex(filePath);
-//checkFocusOrder(filePath);
+// // //checkFocusOrder(filePath);
 checkOneCharacterkey(filePath);
 checkSkipLink(filePath);
 checkOnInput(filePath);
@@ -1365,3 +1623,4 @@ checkLabel(filePath);
 checkLabelsHaveText(filePath);
 extractLinks(filePath);
 checkDefaultEventOverrides(filePath);
+//console.log(violations);
