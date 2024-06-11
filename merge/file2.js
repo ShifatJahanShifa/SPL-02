@@ -1,7 +1,8 @@
 const fs = require('fs');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-let newFilePath='SPLtried/merge/updatedSourcecode.html';
+const langdetect = require('langdetect');
+let newFilePath='SPLtried/merge/updatedSourcecode1.html';
 
 
 module.exports = async function(logs, filePath) 
@@ -151,7 +152,7 @@ module.exports = async function(logs, filePath)
                         // Create a submit button element
                         if(index===violation.indexNo) 
                         {
-                            console.log("was here");
+                            
                             const submitButton = doc.createElement('input');
                             submitButton.type = 'submit';
                             submitButton.value = 'Submit';
@@ -230,7 +231,24 @@ module.exports = async function(logs, filePath)
                             element.removeAttribute('onmousedown');
                         }
                     });
-                    break;
+                    break;  
+
+
+                //------------ solution level AA----------------
+                //------------ Shifa --------------------- 
+
+                case "1.3.5": 
+                    const allForms = doc.querySelectorAll('form');
+
+                    allForms.forEach((item, index) => {
+                        if (index === violation.indexNo) 
+                        {
+                            item.setAttribute('autocomplete', 'on');
+                        }
+                    });
+                    break;  
+
+                
             }
         });
     });

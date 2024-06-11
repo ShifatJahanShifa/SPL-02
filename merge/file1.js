@@ -4,7 +4,10 @@ const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs');
 const readline = require('readline');
-const filePath='SPLtried/merge/sourcecode.html';
+const langdetect = require('langdetect');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const filePath='SPLtried/merge/sourcecode1.html';
 
 let violations=[];
 let details=[];
@@ -53,7 +56,7 @@ async function parseHTMLFile(filePath) {
             {
                 check=0;
                 const src=srcMatch[1];
-                //imagesWithoutAlt.push({ src, lineNumber });  
+                 
                 
                 // ***** changed ******
                 //details[keyy].push(lineNumber, "null", "null");
@@ -1817,7 +1820,6 @@ async function extractLinks(filePath) {
     const page = await browser.newPage();
 
     try {
-        //await page.goto(url, { waitUntil: 'domcontentloaded' });
         await page.setContent(filePath, { waitUntil: 'domcontentloaded' });
         // Extract all <a> elements from the page
         const links = await page.evaluate(() => {
@@ -1888,8 +1890,7 @@ async function checkDefaultEventOverrides(filePath) {
     const page = await browser.newPage();
 
     try {
-        // console.log(url);
-        //await page.goto(url, { waitUntil: 'domcontentloaded' }); 
+        
         await page.setContent(filePath, { waitUntil: 'domcontentloaded' });
         const overriddenElements = await page.evaluate(() => {
             const overriddenElements = [];
@@ -1951,24 +1952,126 @@ async function checkDefaultEventOverrides(filePath) {
 }
 
 
-//parseHTMLFile(filePath);
-// checkCaption(filePath);
-// checkTableCaption(filePath);
-// checkAudioElements(filePath);
-// checkAccessibilityWithTabindex(filePath);
-// // // //checkFocusOrder(filePath);
-// checkOneCharacterkey(filePath);
-// checkSkipLink(filePath);
-// checkOnInput(filePath);
-// //checkLabel(filePath);
-// checkLabelsHaveText(filePath);
-// extractLinks(filePath);
-// checkDefaultEventOverrides(filePath);
-// console.log(violations);
-// console.log(details);  
+// ---------------------  AA rules  ------------------------ 
+
+//   @author: Shifat Jahan Shifa 
+
+async function downloadAndParseWebpage(url) {
+    try {
+        const noAuto = [];
+
+        const fileStream = fs.createReadStream(filePath);
+        const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity
+        }); 
+
+        let keyy="1.3.5";
+
+        let lineNumber = 0;
+        let check = 0;
+        let autoMatch;
+        let temp;
+        let indexNo=0;
+        let perLine=[];
+        let cmnt=0;
+        
+        // Process each line of the HTML content
+        for await (const line of rl)
+        {
+            lineNumber++;
+            if(line.includes('<!--')) 
+            {
+                cmnt=1;
+            }
+            if(cmnt) 
+            {
+                if(line.includes('-->')) 
+                {
+                    cmnt=0;
+                }
+                continue;
+            }
+            if (check == 1) 
+            {
+                if (line.includes('<form')) 
+                {
+                    check = 0;
+                    let rep;
+                    rep='form without autocomplete. ';
+                    rep=rep.concat(" line number: ",temp);
+                    noAuto.push(rep);
+                    perLine.push({keyy, indexNo}); 
+                    indexNo++;
+                }
+                else if (line.includes('autocomplete')) 
+                {
+                    check=0;
+                    autoMatch = line.match(/autocomplete="([^"]+)"/);
+                    if (autoMatch) 
+                    {
+                        const autoStr = autoMatch[1].trim();
+                        if(autoStr!=='on') 
+                        {
+                            let rep;
+                            rep='form without autocomplete. ';
+                            rep=rep.concat(" line number: ",lineNumber);
+                            noAuto.push(rep);
+                            perLine.push({keyy, indexNo});
+                        }
+                    }
+                    indexNo++;
+                }
+            }
+            if (line.includes('<form')) 
+            {
+                autoMatch = line.match(/autocomplete="([^"]+)"/);
+                if (autoMatch) 
+                {
+                    const autoStr = autoMatch[1].trim();
+                    if(autoStr!=='on') 
+                    {
+                        let rep;
+                        rep='form without autocomplete. ';
+                        rep=rep.concat(" line number: ",lineNumber);
+                        noAuto.push(rep);
+                        perLine.push({keyy, indexNo});
+                    }
+                    indexNo++;
+                }
+                else 
+                {
+                    temp=lineNumber;
+                    check=1;
+                }
+            }
+        }
+        if(check==1) 
+        {
+            let rep;
+            rep='form without autocomplete. ';
+            rep=rep.concat(" line number: ",temp);
+            noAuto.push(rep);
+            perLine.push({keyy, indexNo});
+        }
+        if(noAuto.length>0) 
+        {
+            violations.push(noAuto);
+            details.push(perLine);  
+        }
+    } 
+    catch (error) 
+    {
+        console.error('Error downloading or parsing the webpage:', error);
+    }
+}
+
 
 async function runDetection() 
 {
+    //------------ level A --------------------
+    //------------ Shifa ---------------------
+
     await parseHTMLFile(filePath);
     await checkCaption(filePath);
     await checkTableCaption(filePath);
@@ -1981,9 +2084,22 @@ async function runDetection()
     await checkLabelsHaveText(filePath);
     await extractLinks(filePath);
     await checkDefaultEventOverrides(filePath);
+
+
+
+    //----------- swadhin--------------------- 
+
+
+    //------------ level AA --------------------
+    //------------ Shifa ---------------------
+
+    await downloadAndParseWebpage(filePath);
+    
+
+
+    
     console.log(violations);
-    // console.log(details);
- 
+    
     // Pass logs to the solution file
     require('./file2')(details, filePath);
 }
