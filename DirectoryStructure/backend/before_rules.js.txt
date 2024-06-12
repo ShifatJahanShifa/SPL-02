@@ -3,12 +3,10 @@ const axios = require('axios');
 const { exec } = require('child_process');
 
 // Define the path to your check.js script
-const checkScriptPath = 'ruleviolation.js';
-let filePath;
+const checkScriptPath = 'check.js';
 
 // Function to execute the check.js script
 function runCheckScript(filePath) {
-    console.log(filePath);
     // Construct the command to run the check.js script with the file path argument
     const command = `node ${checkScriptPath} ${filePath}`;
 
@@ -33,24 +31,17 @@ function runCheckScript(filePath) {
 
 
 // Function to perform analysis on the provided URL
-function analysis0(url) {
+function analysis(url) {
     console.log('Performing analysis on URL:', url);
 
     // Call getSourceCode to get the source code of the webpage
     getSourceCode(url);
-    filePath = 'sourcecode.html';
-    runCheckScript(filePath);
-}
-
-function analysis1(){
-    //console.log('Performing analysis on file:');
-    filePath = `sourcecode.html`;
-    console.log('Performing analysis on file:', filePath);
+    const filePath = 'sourceCode.html';
     runCheckScript(filePath);
 }
 
 // Export the analysis function
-module.exports = { analysis0, analysis1 };
+module.exports = analysis;
 
 // Function to get the source code of a webpage
 async function getSourceCode(url) {
@@ -60,7 +51,7 @@ async function getSourceCode(url) {
         const htmlContent = response.data;
 
         // Write the HTML content to a file
-        filePath = 'sourcecode.html';
+        const filePath = 'sourcecode.html';
         fs.writeFileSync(filePath, htmlContent);
 
         // Perform any additional actions with the source code if needed
