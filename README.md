@@ -14,8 +14,8 @@ It incorporates the SaaS (Software as a Service) model. For the subscribed users
 - [Setup](#setup-🛠️)
   - [Requirements](#requirements)
   - [Installation Instructions](#installation-instructions)
-- [Video Demo](#video-demo-📹)
-- [Contact](#contact-📞)
+- [Usage](#Usage)
+- [Authors](#Authors)
 
 ## Technologies Used 💻
 
@@ -46,7 +46,7 @@ Features of e-Accessibility system:
 
 - two types of users: unsubscribed and subscribed users. According to users, there are two types of dashboards: unsubscribed and subscribed users dashboards .
 - in unsubscribed users dashboard: users can only input url for generating report. They can't have solution for violation.
-- in subscribed users dashboard: users can input both url and html source code file for generating report. They can get solution for violation. Also they can filter tests for level A, AA.
+- in subscribed users dashboard: users can input both url and html source code file for generating report. They can get solution for violation. Also they can     filter tests for level A, AA.
 - users manage profiles and subscriptions.
 
 
@@ -64,93 +64,87 @@ Features of e-Accessibility system:
 - Logic analysis identifies violations; reports generated for users.
 
 
-### Features for Students 🎓
+#### Accessibility Review:
 
-#### Lesson Access 📖
+- System generates reports indicating accessibility violations by line.
+- option to export report in PDF format.
+- view the error in the website
+- Sample solutions available for subscribed users based on report findings.
 
-- 🚀 Access lessons by simply running the application.
-- 🔀 Switch between lessons using the spacebar.
 
-#### Evaluation Window 🧩
+#### Sample Solution and Rating:
 
-- 🧩 Engage in various assessment categories:
-  - 🧩 Puzzle Playing: Solve image-based puzzles.
-  - 🧩 Word Matching: Match images to their corresponding names.
-  - 🧩 MCQ Questions: Answer multiple-choice questions with text and images.
-  - 🧩 Sequencing Activity: Sort pictures into a sequence.
+- Subscribed users receive sample solutions and improved website ratings.
+- Solutions include corrected code snippets improved HTML tags,styling property.
+- Rating reflects website improvements based on provided sample solutions.
 
-#### Celebration Page 🎉
 
-- 🎉 After each assessment, a celebration page appears.
-- 🚀 Press the spacebar to advance to the next assessment.
 
 ## User Manual 📖
 
-Our user manual provides clear instructions for both instructors and students:
+Our user manual provides clear instructions for all users:
 
-### For Instructors 👩‍🏫
-
-- 📝 Learn to manage student data.
-- 📚 Create customized lessons.
-- 📊 Make assessment questions.
-- 📈 Access and interpret student performance data.
-
-### For Students 🎓
-
-- 📖 Understand how to access and navigate lessons.
-- 🧩 Get acquainted with the different evaluation categories.
-- 🎉 Celebrate your achievements after each assessment.
+- from home page, user can either register or login to the system.
+- all registered user will view unsubscribed users dashboard.
+- unsubscribed users can input the website url to check the accessibility violations in the website.
+- unsubscribed users can subscribe for having the solution of the website.
+- the report page have an option to view the violation in the website in real time.
+- the users can see the violations in the below of the report page. they can generate pdf of the violations.
+- the subscribed users can download the solution. the solution is the updated html source code.
+- for subscription, users can pay using any of the way like online banking, credit card, mobile banking etc.
+- after successful payment, users will be redirect to subscribed users dashboard.
+- system will notifyfor unsuccessful payment
+- subscribed users can input both url and source code file in to the system.
+- subscribed users can also have the filter option for label A and AA.
 
 ## Setup 🛠️
 
 #### Requirements:
 
-- [Download](https://www.codecguide.com/download_k-lite_codec_pack_basic.htm) **K-Lite Codec Pack** for smooth video streaming.
+- Puppeteer Library, node js, react js, sandbox API, MySQL database
 
 #### Installation Instructions:
 
-> For Teacher:
-
-```
-git clone https://github.com/ahmedfahad04/SPL-2.git
-cd EmPower
-cb Teacher
-python3 main.pyw
+Install puppeteer: 
+```bash
+    npm install puppeteer
 ```
 
-> For Student:
+Install puppeteer: 
+```bash
+    npm install puppeteer
+``` 
 
+Install sandbox API:
+```bash
+    npm i sslcommerz-lts
 ```
-git clone https://github.com/ahmedfahad04/SPL-2.git
-cd EmPower
-cb Student
-python3 main.pyw
+
+## Usage
+
+```bash
+    git clone: https://github.com/ShifatJahanShifa/SPL-02.git
 ```
 
-## Video Demo 📹
+To run the project: 
 
-- Teacher
-  
+Run Fronted code: 
+```bash
+    cd DirectoryStructure
+    cd fronted
+    npm start
+``` 
 
-https://github.com/ahmedfahad04/SPL-2/assets/60494055/95c44663-5371-45b7-9a38-d849fd09ef0c
+Run Backend code:
+```bash
+    cd DirectoryStructure
+    cd backend
+    node index.js
+``` 
 
+## Authors
 
+- [@ShifatJahanShifa](https://www.github.com/ShifatJahanShifa) 
+- [@SwadhinPal](https://github.com/swadhinpal)
 
-- Student
-
-
-
-https://github.com/ahmedfahad04/SPL-2/assets/60494055/c42ce17a-0d58-45c8-b914-fd1d85c80a0c
-
-
-
-## Contact 📞
-
-Created by:
-
-1. [Istiaq Ahmed Fahad](https://github.com/ahmedfahad04)
-2. [Kamruzzaman Asif](https://github.com/KamruzzamanAsif)
-
-- feel free to contact us!
-
-## EmPower is designed to empower both teachers and students, offering an inclusive and effective learning experience for autistic children. 🌈
+### e-Accessibility is designed to empower developers in developing a more accessibile website. Happy Coding! 🍵👨‍💻👩‍💻
