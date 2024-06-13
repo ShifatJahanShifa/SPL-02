@@ -1,0 +1,37 @@
+.fail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .fail-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .fail-container p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .retry-button, .home-button {
+    background-color: #721c24;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+  }
+  
+  .retry-button:hover, .home-button:hover {
+    background-color: #a52a2a;
+  }
+  

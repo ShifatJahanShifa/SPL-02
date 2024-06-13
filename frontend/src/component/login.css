@@ -1,0 +1,99 @@
+#lg {
+    width: 100%;
+    height: 100vh;
+    background-image: linear-gradient(rgba(105, 126, 175, 0.8), rgba(143, 156, 88, 0.8)), url(images/login.jpeg);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: center;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+  }
+  
+  .login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+}
+  .login-container h2 {
+    /* color: #333;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    font-size: 24px;
+    line-height: 1.5; */
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #903390;
+  }
+
+
+  
+  .login-container form {
+    background-color: rgba(255, 255, 255, 0.8);
+    /* padding: 40px 20px;
+    margin: 20px auto;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center; */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+ 
+  .login-container input {
+    /* width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; */
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+
+  
+  .login-container button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+
+  .login-container button:hover {
+    background-color: #45a049;
+  }
+  
+  .login-container p {
+    margin-top: 20px;
+    color: #555;
+  }
+  
+  .login-container a {
+    color: #4CAF50;
+    text-decoration: none;
+  }
+  
+  .login-container a:hover {
+    text-decoration: underline;
+  }
+  
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+
