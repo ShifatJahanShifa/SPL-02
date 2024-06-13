@@ -1,0 +1,28 @@
+.nav-links {
+    display: flex;
+    justify-content: center; /* Center the links horizontally */
+    gap: 20px; /* Add space between the links */
+    margin: auto;
+    margin-top: 5px; /* Add some space above the links */
+}
+
+.nav-link {
+    color: #130e13; /* Set link color to white */
+    text-decoration: none; /* Remove underline */
+    padding: 0px 0px; /* Add padding to make the boxes bigger */
+    background-color: rgb(234, 225, 232); /* Background color */
+    border-radius: 50px; /* Add rounded corners */
+    font-size: 0.8em; /* Increase font size */
+    display: flex; /* Use flex to align text properly */
+    align-items: center; /* Center align text vertically */
+    justify-content: center; /* Center align text horizontally */
+    width: 150px; /* Set a fixed width */
+    height: 50px; /* Set a fixed height */
+}
+
+.nav-link p {
+    color:#130e13;
+    margin: 0; /* Remove default margin */
+    text-align: center;
+    font-size: inherit; /* Inherit font size from parent */
+}
